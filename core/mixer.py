@@ -3,6 +3,7 @@ from collections import defaultdict
 import threading
 import time
 import numpy as np
+import Leap
 
 from profilehooks import profile
 
@@ -55,7 +56,9 @@ class Mixer(QtCore.QObject):
         self._last_tick_time = time.time()
         self._audio_emitters_by_group = {}
         self._layers = []
-
+        self._leap_controller = Leap.Controller()
+                
+        
         if self._app.args.yappi and USE_YAPPI:
             yappi.start()
 
@@ -72,6 +75,17 @@ class Mixer(QtCore.QObject):
 
             self._main_buffer = BufferUtils.create_buffer()
 
+    def setForegroundLayer(self, layername):
+        for layer in _layers:
+            if layer.name == layername:
+                layer.setForeground()
+            else:
+                layer.setBackground()
+
+                
+    def getLeapFrame(self):
+        return self._leap_controller.frame()
+            
     def save(self):
         for layer in self._layers:
             layer.save()

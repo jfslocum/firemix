@@ -28,7 +28,7 @@ def blend_to_buffer(source, destination, progress, mode):
     h2,l2,s2 = destination.T
 
     if mode == 'overwrite':
-        not_dark = l1 > 0.0
+        not_dark = l1 > 0.01
         destination[not_dark] = source[not_dark]
     else:
         raise NotImplementedError

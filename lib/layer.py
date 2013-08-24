@@ -14,9 +14,13 @@ class Layer(QtCore.QObject):
 
     def __init__(self, app, name):
         super(Layer, self).__init__()
+        self.volumeGain = 1.0 #full
+        self.lightGain = 1.0 #full
+        self.foreground = False
         self._app = app
         self._mixer = app.mixer
         self._enable_profiling = self._app.args.profile
+        self.enabled = True
         self.name = name
         self._playlist = None
         self._scene = app.scene
@@ -89,6 +93,14 @@ class Layer(QtCore.QObject):
             return
         self.start_transition(self._playlist.get_preset_relative_to_active(-1))
 
+
+    def enable(self):
+        self.enabled = True
+
+    def disable(self):
+        self.enabled = False
+        
+        
     def start_transition(self, next=None):
         """
         Starts a transition.  If a name is given for Next, it will be the
@@ -149,7 +161,7 @@ class Layer(QtCore.QObject):
             active_preset.on_feature(feature)
 
     def draw(self, dt):
-        if len(self._playlist) == 0:
+        if (not self.enabled) or (len(self._playlist) == 0):
             self._main_buffer *= (0.0, 0.0, 0.0)
             return self._main_buffer
 
@@ -215,6 +227,7 @@ class Layer(QtCore.QObject):
                 self.start_transition()
                 self._elapsed = 0.0
 
+        mixed_buffer *= (self.lightGain, self.lightGain, self.lightGain) #dim background layers
         return mixed_buffer
 
     def render_presets(self, first_preset, first_buffer,
@@ -248,3 +261,21 @@ class Layer(QtCore.QObject):
                             raise ValueError
 
         return first_buffer
+
+
+    def setForeground(self):
+        self.enable()
+        self.foreground = True
+        self.setVolume(1.0)
+        self.lightGain = 1.0 #full
+
+
+    def setVolume(self, volume):
+        raise NotImplementedError
+        
+    def setBackground(self):
+        """default behavior is to reduce perceived brightness/loudness by about half"""
+        self.foreground = False
+        self.setVolume(0.2) 
+        self.lightGain = 0.2 
+        

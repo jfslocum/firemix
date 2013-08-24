@@ -146,6 +146,21 @@ class OscServer(liblo.ServerThread):
     def layer_previous_preset(self, layer):
         layer.prev()
 
+    @layer_handler('/firemix/layer/disable')
+    def layer_previous_preset(self, layer):
+        layer.disable()
+
+    @layer_handler('/firemix/layer/enable')
+    def layer_previous_preset(self, layer):
+        layer.enable()
+
+    @string_handler('/firemix/layer/set_foreground_layer')
+    def load_playlist(self, layer_name):
+        """Tell the mixer which layer to set as foreground"""
+        self.mixer.setForegroundLayer(layer_name)
+
+        
+        
     @no_arg_handler('/firemix/layer/start_transition')
     def layer_start_transition_all(self):
         for layer in self.mixer._layers:

@@ -24,6 +24,8 @@ if __name__ == "__main__":
     parser.add_argument("--playlist", type=str, help="Playlist file to load", default=None)
     parser.add_argument("--speech_layer", action='store_const', const=True, default=False, help="Enable speech layer.")
     parser.add_argument("--speech_playlist", type=str, help="Playlist file to load for the speech layer.", default=None)
+    parser.add_argument("--leap_layer", action='store_const', const=True, default=False, help="Enable leap layer.")
+    parser.add_argument("--leap_playlist", type=str, help="Playlist file to load for the leap layer.", default=None)
     parser.add_argument("--profile", action='store_const', const=True, default=False, help="Enable profiling")
     parser.add_argument("--yappi", action='store_const', const=True, default=False, help="Enable YAPPI")
     parser.add_argument("--nogui", action='store_const', const=True, default=False, help="Disable GUI")

@@ -19,7 +19,7 @@ class Playlist(JSONDict):
     class Notifier(QtCore.QObject):
         playlist_changed = QtCore.Signal()
 
-    def __init__(self, app, name, last_playlist_settings_key):
+    def __init__(self, app, name, last_playlist_settings_key, subdir = ''):
         self._app = app
         self._notifier = Playlist.Notifier()
         self._last_playlist_settings_key = last_playlist_settings_key
@@ -27,7 +27,7 @@ class Playlist(JSONDict):
         if self.name is None:
             self.name = self._app.settings.get("mixer").get(
                 self.last_playlist_settings_key, "default")
-        filepath = os.path.join(os.getcwd(), "data", "playlists", "".join([self.name, ".json"]))
+        filepath = os.path.join(os.getcwd(), "data", "playlists", subdir, "".join([self.name, ".json"]))
         JSONDict.__init__(self, 'playlist', filepath, True)
 
         self.open()

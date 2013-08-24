@@ -1,0 +1,10 @@
+{
+    "file-type": "playlist", 
+    "playlist": [
+        {
+            "classname": "LeapDemo", 
+            "name": "LeapDemo-1", 
+            "params": {}
+        }
+    ]
+}
