@@ -13,6 +13,7 @@ from lib.osc_server import OscServer
 from lib.buffer_utils import BufferUtils
 from lib.specialLayers import MusicLayer, SpeechLayer, LeapLayer
 from lib.playlist import Playlist
+from lib.audiolist import Audiolist
 
 log = logging.getLogger("firemix")
 
@@ -32,23 +33,36 @@ class FireMixApp(QtCore.QThread):
         self.mixer = Mixer(self)
 
         # Create the default layer.
-        default_playlist = Playlist(self, self.args.playlist, 'last_playlist', subdir = 'Music')
+        default_playlist = Playlist(self, self.args.playlist, 'last_playlist',
+                                    subdir = 'Music')
+        default_audiolist = Audiolist(self, self.args.audiobehaviors, 'last_audiolist',
+                                      subdir = 'Music')
         default_layer = MusicLayer(self)
         default_layer.set_playlist(default_playlist)
+        default_layer.set_audiolist(default_audiolist)
+        default_layer.setForeground()
         self.mixer.add_layer(default_layer)
 
-        if self.args.speech_layer:
+        if self.args.speech_layer or self.args.all:
             speech_playlist = Playlist(self, self.args.speech_playlist,
                                        'last_speech_playlist', subdir = 'Speech')
+            speech_audiolist = Audiolist(self, self.args.speech_audiobehaviors,
+                                         'last_speech_audiolist', subdir = 'Speech')
             speech_layer = SpeechLayer(self)
             speech_layer.set_playlist(speech_playlist)
+            speech_layer.set_audiolist(speech_audiolist)
+            speech_layer.setBackground()
             self.mixer.add_layer(speech_layer)
 
-        if self.args.leap_layer:
+        if self.args.leap_layer or self.args.all:
             leap_playlist = Playlist(self, self.args.leap_playlist,
                                      'last_leap_playlist', subdir = 'Leap')
+            leap_audiolist = Audiolist(self, self.args.leap_audiobehaviors,
+                                       'last_leap_audiolist', subdir = 'Leap')
             leap_layer = LeapLayer(self)
             leap_layer.set_playlist(leap_playlist)
+            leap_layer.set_audiolist(leap_audiolist)
+            leap_layer.setBackground()
             self.mixer.add_layer(leap_layer)
             
 

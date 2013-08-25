@@ -6,7 +6,9 @@ import random
 from PySide import QtCore
 
 from lib.json_dict import JSONDict
-from lib.preset_loader import PresetLoader
+from lib.preset_loader import Loader
+from lib.preset import Preset
+
 
 log = logging.getLogger("firemix.lib.playlist")
 
@@ -26,7 +28,7 @@ class Playlist(JSONDict):
         self.name = name
         if self.name is None:
             self.name = self._app.settings.get("mixer").get(
-                self.last_playlist_settings_key, "default")
+                self._last_playlist_settings_key, "default")
         filepath = os.path.join(os.getcwd(), "data", "playlists", subdir, "".join([self.name, ".json"]))
         JSONDict.__init__(self, 'playlist', filepath, True)
 
@@ -43,7 +45,7 @@ class Playlist(JSONDict):
             print "Error loading %s" % self.filename
             return False
 
-        self._loader = PresetLoader()
+        self._loader = Loader('presets', Preset, interface_names=['Preset', 'RawPreset'])
         self._preset_classes = self._loader.load()
         self._playlist_data = self.data.get('playlist', [])
         self._playlist = []

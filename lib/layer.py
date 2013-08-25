@@ -23,6 +23,7 @@ class Layer(QtCore.QObject):
         self.enabled = True
         self.name = name
         self._playlist = None
+        self._audiolist = None
         self._scene = app.scene
         self._main_buffer = None
         self._secondary_buffer = None
@@ -55,6 +56,9 @@ class Layer(QtCore.QObject):
     def set_playlist(self, playlist):
         self._playlist = playlist
 
+    def set_audiolist(self, audiolist):
+        self._audiolist = audiolist
+        
     def playlist(self):
         return self._playlist
 
@@ -157,9 +161,14 @@ class Layer(QtCore.QObject):
     def feature_received(self, feature):
         # Notify active preset of feature.
         active_preset = self._playlist.get_active_preset()
+        active_behavior = self._audiolist.get_active_behavior()
         if active_preset:
             active_preset.on_feature(feature)
 
+        if active_behavior:
+            active_behavior.on_feature(feature)
+
+            
     def draw(self, dt):
         if (not self.enabled) or (len(self._playlist) == 0):
             self._main_buffer *= (0.0, 0.0, 0.0)
@@ -167,6 +176,10 @@ class Layer(QtCore.QObject):
 
         self._elapsed += dt
 
+        active_behavior = self._audiolist.get_active_behavior()
+        if active_behavior: #it's perfectly acceptable for no audio behavior to exist
+            active_behavior.tick(dt)
+        
         active_preset = self._playlist.get_active_preset()
         active_index = self._playlist.get_active_index()
 

@@ -2,53 +2,59 @@ import os
 import logging
 import inspect
 
-from lib.preset import Preset
-
+# from lib.preset import Preset
+# from lib.audio_behavior import AudioBehavior
 log = logging.getLogger("firemix.lib.preset_loader")
 
 
-class PresetLoader:
+class Loader:
     """
-    Scans the ./presets/ directory and imports all the presets objects.
+    Scans the given directory and imports all the objects inheriting from a specified class.
 
     Based on code copyright 2005 Jesse Noller <jnoller@gmail.com>
     http://code.activestate.com/recipes/436873-import-modulesdiscover-methods-from-a-directory-na/
     """
 
-    def __init__(self):
-        self._modules = []
-        self._presets = []
+    def __init__(self, objects_directory, superclass, interface_names=None):
+        if interface_names is None:
+            interface_names = [superclass.__name__]
+        self.modules = []
+        self.objects = []
+        self.objects_directory = objects_directory
+        self.superclass = superclass
+        self.interface_names = interface_names
 
     def load(self):
-        self._modules = []
-        self._presets = []
-        log.info("Loading presets...")
-        for f in os.listdir(os.path.join(os.getcwd(), "presets")):
+        self.modules = []
+        self.objects = []
+        log.info("Loading objects...")
+        for f in os.listdir(os.path.join(os.getcwd(), self.objects_directory)):
             module_name, ext = os.path.splitext(f)
             if ext == ".py":
                 # Skip emacs lock files.
                 if f.startswith('.#'):
                     continue
-
-                module = __import__("presets." + module_name, fromlist=['dummy'])
-                self._modules.append(module)
-                self._load_presets_from_modules(module)
-        log.info("Loaded %d presets." % len(self._presets))
-        return dict([(i.__name__, i) for i in self._presets])
+                print "Loading module ", self.objects_directory+"." + module_name
+                module = __import__(self.objects_directory+"." + module_name, fromlist=['dummy'])
+                self.modules.append(module)
+                self.load_from_modules(module)
+        log.info("Loaded %d objects." % len(self.objects))
+        return dict([(i.__name__, i) for i in self.objects])
 
     def reload(self):
-        """Reloads all preset modules"""
-        self._presets = []
-        for module in self._modules:
+        """Reloads all object modules"""
+        self.objects = []
+        for module in self.modules:
             reload(module)
-            self._load_presets_from_modules(module)
-        return dict([(i.__name__, i) for i in self._presets])
+            self.load_from_modules(module)
+        return dict([(i.__name__, i) for i in self.objects])
 
-    def _load_presets_from_modules(self, module):
+    def load_from_modules(self, module):
         for name, obj in inspect.getmembers(module, inspect.isclass):
-            if issubclass(obj, Preset) and (name is not "Preset") and (name is not "RawPreset"):
+            if issubclass(obj, self.superclass) and name not in self.interface_names:
                 log.info("Loaded %s" % obj.__name__)
-                self._presets.append(obj)
+                print "loaded class ", name
+                self.objects.append(obj)
 
 
 

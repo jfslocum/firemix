@@ -1048,11 +1048,6 @@
         "color-mode": "BGR8",
         "enabled": true,
         "id": 17
-    },
-    {
-        "color-mode": "BGR8",
-        "enabled": true,
-        "id": 18
     }
   ]
 }
